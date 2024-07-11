@@ -19,6 +19,7 @@ int main(void) {
   InitWindow(800, 400, "My horror game :)");
   std::cout << "Let the horror begin!" << std::endl;
   emscripten_set_main_loop(Loop, 0, 1);
+   
   
 
 

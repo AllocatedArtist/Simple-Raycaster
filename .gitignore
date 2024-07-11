@@ -30,6 +30,7 @@ index.html
 *.js
 *.wasm
 temp
+headers
 
 # Executables
 *.exe
