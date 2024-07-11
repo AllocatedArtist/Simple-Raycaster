@@ -26,6 +26,11 @@
 *.a
 *.lib
 
+*.html
+*.js
+*.wasm
+temp
+
 # Executables
 *.exe
 *.out
