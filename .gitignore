@@ -26,7 +26,7 @@
 *.a
 *.lib
 
-*.html
+index.html
 *.js
 *.wasm
 temp

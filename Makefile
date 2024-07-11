@@ -5,7 +5,7 @@ OPT = -O2
 FLAGS = -Wall -std=c++17 -g --shell-file custom_html/custom_page.html
 
 all: $(OBJ)
-	$(GPP) -o game.html $(FLAGS) $<
+	$(GPP) -o index.html $(FLAGS) $<
 	
 temp/%.o: %.cc 
 	$(GPP) -c $< $(OPT) -o $@
