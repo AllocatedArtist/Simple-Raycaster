@@ -19,7 +19,7 @@ int map[MAP_WIDTH][MAP_HEIGHT] = {
   1, 0, 0, 0, 2, 0, 0, 0, 0, 1,
   1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
   1, 0, 0, 0, 1, 0, 1, 0, 0, 1,
-  1, 0, 0, 0, 2, 1, 2, 1, 0, 1,
+  1, 1, 1, 1, 2, 1, 2, 1, 0, 1,
   1, 0, 0, 0, 0, 1, 0, 0, 0, 1,
   1, 0, 0, 2, 0, 0, 0, 0, 2, 1,
   1, 0, 0, 0, 0, 2, 2, 0, 2, 1,
@@ -29,7 +29,7 @@ int map[MAP_WIDTH][MAP_HEIGHT] = {
 std::array<std::array<Color, SCREEN_WIDTH>, SCREEN_HEIGHT> pixel_buffer = { 0 };
 std::array<uint8_t, SCREEN_WIDTH * SCREEN_HEIGHT> pixel_buffer_tex = { 0 };
 
-Vector2 player_pos = { 1, 2 };
+Vector2 player_pos = { 2, 3 };
 Vector2 player_dir = { 0, -1 };
 Vector2 plane = { -0.66, 0 };
 
@@ -125,19 +125,7 @@ void Raycast() {
     int line_height = static_cast<int>(screen_height / std::abs(perp_wall_distance)); 
  
     int color_index = map[map_y][map_x];
-    Color color;
-
-    switch (color_index) {
-      case 1:
-        color = BLUE;
-        break;
-      case 2:
-        color = RED;
-        break;
-    }
-
-    color = y_side ? ColorBrightness(color, 0.1) : color;
-
+    
     int line_start = (screen_height - line_height) * 0.5;
     int line_end = (line_height + screen_height) * 0.5;
 
