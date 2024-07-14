@@ -7,7 +7,9 @@ FLAGS = -Wall \
 				-g \
 				--shell-file custom_html/custom_page.html \
 				-s USE_GLFW=3 \
-				-s ASSERTIONS=1
+				-s ASSERTIONS=1 \
+				--embed-file assets
+
 
 LIBS = -L lib -l raylib
 HEADER = -I headers/raylib
