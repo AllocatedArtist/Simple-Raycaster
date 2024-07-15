@@ -3,6 +3,8 @@ OBJ = temp/main.o \
 			temp/app.o \
 			temp/scene.o \
 			temp/scene_manager.o \
+			temp/raycaster.o \
+			temp/resource_manager.o 
 
 GPP = em++
 OPT = -O2
