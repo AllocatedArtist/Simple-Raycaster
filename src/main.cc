@@ -7,6 +7,9 @@
 #include <iostream>
 #include <array>
 
+#include "app.h"
+#include "scene.h"
+
 constexpr uint32_t MAP_WIDTH = 10;
 constexpr uint32_t MAP_HEIGHT = 10;
 
@@ -230,7 +233,34 @@ void Loop(void) {
   EndDrawing();
 }
 
+class RedScreen : public Scene {
+public:
+  RedScreen(const std::string& name) : Scene(name) {}
+  void Start() override {}
+  void End() override {}
+  void Update() override {
+    ClearBackground(RED);
+    if (IsKeyPressed(KEY_Q)) {
+      GetSceneManager()->SwitchScene("blue");
+    }
+  }
+};
+
+class BlueScreen : public Scene {
+public:
+  BlueScreen(const std::string& name) : Scene(name) {}
+  void Start() override {}
+  void End() override {}
+  void Update() override {
+    ClearBackground(BLUE);
+    if (IsKeyPressed(KEY_E)) {
+      GetSceneManager()->SwitchScene("red");
+    }
+  }
+};
+
 int main(void) {
+  /*
   InitWindow(800, 400, "My horror game :)");
 
   wall_texture = LoadImage("assets/Brick/Brick_06-128x128.png"); 
@@ -246,6 +276,15 @@ int main(void) {
   pixel_texture.id = rlLoadTexture(nullptr, SCREEN_WIDTH, SCREEN_HEIGHT, RL_PIXELFORMAT_UNCOMPRESSED_R8G8B8A8, 1); 
 
   emscripten_set_main_loop(Loop, 0, 1);
+  */
+
+  App app(SCREEN_WIDTH, SCREEN_HEIGHT, "Horror Game :P");
+
+  app.GetSceneManager()->AddScene<RedScreen>("red");
+  app.GetSceneManager()->AddScene<BlueScreen>("blue");
+
+  app.GetSceneManager()->SwitchScene("red");
+  app.Start();
 
   return 0;
 }

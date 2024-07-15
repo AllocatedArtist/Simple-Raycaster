@@ -1,5 +1,9 @@
 
-OBJ = temp/main.o
+OBJ = temp/main.o \
+			temp/app.o \
+			temp/scene.o \
+			temp/scene_manager.o \
+
 GPP = em++
 OPT = -O2
 FLAGS = -Wall \
@@ -15,9 +19,9 @@ LIBS = -L lib -l raylib
 HEADER = -I headers/raylib
 
 all: $(OBJ)
-	$(GPP) -o index.html $(FLAGS) $(LIBS) $<
+	$(GPP) -o index.html $(FLAGS) $(LIBS) $(OBJ)
 	
-temp/%.o: %.cc 
+temp/%.o: src/%.cc 
 	$(GPP) -c $< $(OPT) $(HEADER) -o $@
 
 .PHONY: clean run
