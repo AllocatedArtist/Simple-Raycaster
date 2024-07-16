@@ -84,7 +84,7 @@ void Raycaster::Render(Info info) {
         y_side = true;
       }      
 
-      map_wall = info.map_[info.map_height_ * map_y + map_x];
+      map_wall = info.map_[map_x + info.map_width_ * map_y];
 
       if (map_wall > 0) {
         hit = true;

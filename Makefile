@@ -4,7 +4,9 @@ OBJ = temp/main.o \
 			temp/scene.o \
 			temp/scene_manager.o \
 			temp/raycaster.o \
-			temp/resource_manager.o 
+			temp/resource_manager.o \
+			temp/level_editor.o \
+			temp/raygui.o
 
 GPP = em++
 OPT = -O2
@@ -18,7 +20,7 @@ FLAGS = -Wall \
 
 
 LIBS = -L lib -l raylib
-HEADER = -I headers/raylib
+HEADER = -I headers
 
 all: $(OBJ)
 	$(GPP) -o index.html $(FLAGS) $(LIBS) $(OBJ)

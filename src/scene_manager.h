@@ -24,6 +24,8 @@ public:
   void SwitchScene(const std::string& new_scene);
   std::unique_ptr<Scene>* GetCurrentScene();
 
+  std::unique_ptr<Scene>* GetScene(const std::string& name);
+
   //Call in Update Loop
   void LoadScene();
 private:

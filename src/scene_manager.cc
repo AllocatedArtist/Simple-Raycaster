@@ -50,3 +50,11 @@ void SceneManager::LoadScene() {
   scene_to_load_.clear();
 }
 
+std::unique_ptr<Scene>* SceneManager::GetScene(const std::string& name) {
+  if (!SceneExists(name)) {
+    return nullptr;
+  }
+  return &scenes_.at(name);
+}
+
+
