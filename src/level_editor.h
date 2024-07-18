@@ -28,10 +28,12 @@ private:
   void DrawGrid();
   void MouseToGrid();
 
-  void CheckForTextures();
+  void CheckForFiles();
   void AddTexture(const char* path);
 
   void ExportLevelData();
+
+  void LoadLevelData(const char* path);
 private:
   float map_width_ = 10;
   float map_height_ = 10;

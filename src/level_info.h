@@ -18,4 +18,6 @@ struct LevelInfo {
   float plane_x_, plane_y_;
 };
 
+LevelInfo LoadLevelInfo(const std::string& filepath);
+
 #endif

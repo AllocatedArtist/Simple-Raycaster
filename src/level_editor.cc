@@ -18,7 +18,21 @@ void LevelEditor::Start() {
   camera_.zoom = 1.0;
   camera_.rotation = 0.0;
   
-  level_.resize((int)map_width_ * (int)map_height_);
+  level_.resize((int)map_width_ * (int)map_height_); 
+}
+
+void LevelEditor::LoadLevelData(const char* path) {
+  LevelInfo info = LoadLevelInfo(path);
+  level_ = info.map_data_;
+  map_height_ = info.map_height_;
+  map_width_ = info.map_width_;
+  player_pos_  = { info.starting_pos_x_ * grid_size_, info.starting_pos_y_ * grid_size_ };
+  player_dir_ = { info.dir_x_, info.dir_y_ };
+  player_plane_ = { info.plane_x_, info.plane_y_ };
+
+  for (const std::string& path : info.texture_paths_) {
+    AddTexture(path.c_str());
+  }
 }
 
 void DrawMouseRect(
@@ -104,11 +118,15 @@ void LevelEditor::MouseToGrid() {
   }
 }
 
-void LevelEditor::CheckForTextures() {
+void LevelEditor::CheckForFiles() {
   if (IsFileDropped()) {
     FilePathList files = LoadDroppedFiles();
     for (int i = 0; i < files.count; ++i) {
-      AddTexture(files.paths[i]);
+      if (IsFileExtension(files.paths[i], ".json")) {
+        LoadLevelData(files.paths[i]);
+      } else {
+        AddTexture(files.paths[i]);
+      }
     }
     UnloadDroppedFiles(files);
   }
@@ -177,7 +195,7 @@ void LevelEditor::Update() {
     player_plane_ = { dir.y, -dir.x };
   }
 
-  CheckForTextures();
+  CheckForFiles();
 
   BeginMode2D(camera_);
 
@@ -198,7 +216,7 @@ void LevelEditor::Update() {
     map_height_ = roundf(map_height_);
     level_.clear();
     level_.resize((int)map_width_ * (int)map_height_);
-  }
+  } 
  
   DrawText(TextFormat("Wall index: %d", wall_), 10, 50, 8, RED);  
 }

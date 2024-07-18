@@ -6,7 +6,8 @@ OBJ = temp/main.o \
 			temp/raycaster.o \
 			temp/resource_manager.o \
 			temp/level_editor.o \
-			temp/raygui.o
+			temp/raygui.o \
+			temp/level_info.o \
 
 GPP = em++
 OPT = -O2
