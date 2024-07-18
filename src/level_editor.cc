@@ -244,6 +244,20 @@ EM_JS(void, _js_save, (const char* filename, const char* text), {
   document.body.removeChild(element);
 });
 
+EM_JS(void, alert_error, (const char* msg), {
+  alert(UTF8ToString(msg));
+});
+
+
+/*
+  if the user attempts to save after having already pressed Q ("game mode"),
+  and one of the images used is not found in the preloaded asset directory,
+  the user can say bye-bye to all their work because of an exception thrown :) 
+
+  to fix this, dropped files should be checked beforehand and only loaded in if they are in the
+  asset directory. i should add this, and it would be easy too, but i won't because I need
+  to sleep.  
+*/
 
 void LevelEditor::ExportLevelData() {
 
@@ -251,13 +265,21 @@ void LevelEditor::ExportLevelData() {
 
   std::vector<std::string> texture_paths_revised;
   FilePathList asset_directory = LoadDirectoryFilesEx("assets", NULL, true);
+
   for (const std::string& path : info.texture_paths_) {
     const char* path_revised = GetFileName(path.c_str());
+    bool found = false;
     for (int i = 0; i < asset_directory.count; ++i) {
       char* asset_path = asset_directory.paths[i];
       if (TextIsEqual(GetFileName(asset_path), path_revised)) {
         texture_paths_revised.push_back(asset_path);
+        found = true;
       }
+    }
+    if (!found) {
+      const char* msg = TextFormat("Unable to find asset [%s] in preloaded assets folder!", path_revised);
+      alert_error(msg);
+      break;
     }
   }
 
@@ -276,7 +298,7 @@ void LevelEditor::ExportLevelData() {
     { "texture_paths", texture_paths_revised }
   };
 
-  _js_save("level.json", data.dump(2).c_str());
+  _js_save("level.json", data.dump(4).c_str());
 }
 
 LevelInfo LevelEditor::GetCurrentLevelInfo() {
