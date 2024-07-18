@@ -30,6 +30,8 @@ private:
 
   void CheckForTextures();
   void AddTexture(const char* path);
+
+  void ExportLevelData();
 private:
   float map_width_ = 10;
   float map_height_ = 10;

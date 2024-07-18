@@ -1,7 +1,11 @@
 #include "level_editor.h"
 
+#include <emscripten/emscripten.h>
+
 #include <raylib/raymath.h>
 #include <raygui/raygui.h>
+
+#include <nlohmann/json.hpp>
 
 #include "scene_manager.h"
 
@@ -162,6 +166,10 @@ void LevelEditor::Update() {
     player_pos_ = GetScreenToWorld2D(GetMousePosition(), camera_);
   }
 
+  if (IsKeyPressed(KEY_S)) {
+    ExportLevelData();
+  }
+
   if (IsKeyDown(KEY_R)) {
     Vector2 target = GetScreenToWorld2D(GetMousePosition(), camera_);
     Vector2 dir = Vector2Normalize(Vector2Subtract(target, player_pos_));
@@ -213,6 +221,62 @@ int LevelEditor::GetMapWidth() const {
 
 int LevelEditor::GetMapHeight() const {
   return (int)map_height_;
+}
+
+/*
+snippet from 
+  https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
+*/
+
+EM_JS(void, _js_save, (const char* filename, const char* text), {
+  let file_name = UTF8ToString(filename);
+  let text_string = UTF8ToString(text);
+
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + text_string);
+  element.setAttribute('download', file_name);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+});
+
+
+void LevelEditor::ExportLevelData() {
+
+  LevelInfo info = GetCurrentLevelInfo();
+
+  std::vector<std::string> texture_paths_revised;
+  FilePathList asset_directory = LoadDirectoryFilesEx("assets", NULL, true);
+  for (const std::string& path : info.texture_paths_) {
+    const char* path_revised = GetFileName(path.c_str());
+    for (int i = 0; i < asset_directory.count; ++i) {
+      char* asset_path = asset_directory.paths[i];
+      if (TextIsEqual(GetFileName(asset_path), path_revised)) {
+        texture_paths_revised.push_back(asset_path);
+      }
+    }
+  }
+
+  UnloadDirectoryFiles(asset_directory);
+
+  nlohmann::json data = {
+    { "map_data", info.map_data_ },
+    { "map_height", info.map_height_ },
+    { "map_width", info.map_width_ },
+    { "starting_pos_x", info.starting_pos_x_ },
+    { "starting_pos_y", info.starting_pos_y_ },
+    { "dir_x", info.dir_x_ },
+    { "dir_y", info.dir_y_ },
+    { "plane_x", info.plane_x_ },
+    { "plane_y", info.plane_y_ },
+    { "texture_paths", texture_paths_revised }
+  };
+
+  _js_save("level.json", data.dump(2).c_str());
 }
 
 LevelInfo LevelEditor::GetCurrentLevelInfo() {

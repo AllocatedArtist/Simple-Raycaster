@@ -26,6 +26,7 @@ public:
     LevelEditor* editor_scene = GetSceneManager()->GetScene<LevelEditor>("editor");
 
     Raycaster::FillLevelData(info_, editor_scene->GetCurrentLevelInfo(), &resource_manager_);
+
  
     player_pos_ = info_.pos_;
     player_dir_ = info_.dir_;
