@@ -32,6 +32,8 @@ public:
   void UpdateBuffer();
 
   void Draw();
+
+  static void FillLevelData(Info& raycaster_info, struct LevelInfo level_info, struct ResourceManager* manager);
 private:
   std::vector<Color> pixel_buffer_;
   Texture render_texture_;

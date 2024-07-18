@@ -5,6 +5,7 @@
 #include <numeric>
 
 #include "resource_manager.h"
+#include "level_info.h"
 
 Raycaster::~Raycaster() {
   rlUnloadTexture(render_texture_.id);
@@ -34,8 +35,8 @@ void Raycaster::Render(Info info) {
     float camera_x = 2 * x / (float)screen_width - 1;
     
     Vector2 raydir;
-    raydir.x = info.dir_.x + info.plane_.x * camera_x;
-    raydir.y = info.dir_.y + info.plane_.y * camera_x;
+    raydir.x = info.dir_.x + info.plane_.x * -camera_x;
+    raydir.y = info.dir_.y + info.plane_.y * -camera_x;
 
     int map_x = static_cast<int>(info.pos_.x);
     int map_y = static_cast<int>(info.pos_.y);
@@ -108,18 +109,16 @@ void Raycaster::Render(Info info) {
     if (line_end >= screen_height) line_end = screen_height - 1;
  
     int texture_index = map_wall - 1;
-
     
     //hacky and dirty... fix
     ResourceManager::ImageResource* image_res = info.resource_manager_->GetImageDataByIndex(texture_index);
     if (image_res == nullptr) {
-      //pray there's an image loaded :)
-      image_res = info.resource_manager_->GetImageDataByIndex(0);
-    }
-
-    if (image_res == nullptr) {
+      for (int y = line_start; y < line_end; ++y) {
+        Color color = PINK;
+        pixel_buffer_[x + width_ * y] = color;
+      }
       return;
-    }
+    } 
 
     float wall_x = 0;
 
@@ -131,8 +130,8 @@ void Raycaster::Render(Info info) {
 
     wall_x -= floorf(wall_x);
 
-    float tex_width = 128;
-    float tex_height = 128;
+    float tex_width = image_res->image_.width;
+    float tex_height = image_res->image_.height;
 
     int tex_x = static_cast<int>(wall_x * tex_width);
 
@@ -178,4 +177,25 @@ void Raycaster::UpdateBuffer() {
 
 void Raycaster::Draw() {
   DrawTexture(render_texture_, 0, 0, WHITE);
+}
+
+void Raycaster::FillLevelData(
+  Raycaster::Info& raycaster_info, 
+  struct LevelInfo level_info,
+  struct ResourceManager* manager
+) {
+  if (manager == nullptr) {
+    TraceLog(LOG_ERROR, "RESOURCE MANAGER IS NULL");
+    return;
+  }
+  raycaster_info.resource_manager_ = manager;
+  raycaster_info.map_ = level_info.map_data_;
+  raycaster_info.map_width_ = level_info.map_width_;
+  raycaster_info.map_height_ = level_info.map_height_;
+  raycaster_info.pos_ = { level_info.starting_pos_x_, level_info.starting_pos_y_ };
+  raycaster_info.dir_ = { level_info.dir_x_, level_info.dir_y_ };
+  raycaster_info.plane_ = { level_info.plane_x_, level_info.plane_y_ };
+  for (const std::string& path : level_info.texture_paths_) {
+    raycaster_info.resource_manager_->CreateImage(path);
+  }
 }

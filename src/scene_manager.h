@@ -24,6 +24,12 @@ public:
   void SwitchScene(const std::string& new_scene);
   std::unique_ptr<Scene>* GetCurrentScene();
 
+  template <typename T>
+  T* GetScene(const std::string& name) {
+    static_assert(std::is_base_of<Scene, T>(), "Type must derive from scene!");
+    return dynamic_cast<T*>(GetScene(name)->get());
+  }
+
   std::unique_ptr<Scene>* GetScene(const std::string& name);
 
   //Call in Update Loop

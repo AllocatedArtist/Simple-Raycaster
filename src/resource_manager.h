@@ -20,7 +20,6 @@ public:
   ResourceManager(const ResourceManager&& manager) = delete;
 
   void CreateImage(const std::string& path);
-  void DeleteImage(const std::string& path);
 
   ImageResource* GetImageDataByPath(const std::string& path);
   ImageResource* GetImageDataByIndex(int index);
