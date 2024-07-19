@@ -30,9 +30,13 @@ public:
     player_pos_ = info_.pos_;
     player_dir_ = info_.dir_;
     plane_ = info_.plane_;
+
+    DisableCursor();
   }
 
-  void End() override {}
+  void End() override {
+    EnableCursor();
+  }
 
   void Update() override {
     ClearBackground(BLACK);
@@ -40,14 +44,13 @@ public:
       GetSceneManager()->SwitchScene("editor");
     }
 
-    if (IsKeyDown(KEY_LEFT)) {
-      player_dir_ = Vector2Rotate(player_dir_, -2.0 * DEG2RAD);
-      plane_ = Vector2Rotate(plane_, -2.0 * DEG2RAD);
-    }
-    if (IsKeyDown(KEY_RIGHT)) {
-      player_dir_ = Vector2Rotate(player_dir_, 2.0 * DEG2RAD);
-      plane_ = Vector2Rotate(plane_, 2.0 * DEG2RAD);
-    }
+    float mouse_x = GetMouseDelta().x * GetFrameTime();
+
+    if (mouse_x != prev_mouse_x) {
+      prev_mouse_x = mouse_x * GetFrameTime();
+      player_dir_ = Vector2Rotate(player_dir_, sensitivity_ * DEG2RAD * mouse_x);
+      plane_ = Vector2Rotate(plane_, sensitivity_ * DEG2RAD * mouse_x);
+    } 
 
     std::vector<uint32_t> level_copy = info_.map_;
     int width = info_.map_width_;
@@ -59,14 +62,27 @@ public:
       return false;
     };
 
-    if (IsKeyDown(KEY_UP)) {
+    if (IsKeyDown(KEY_W)) {
       Vector2 new_pos = Vector2Add(player_pos_, Vector2Scale(player_dir_, 2.0 * GetFrameTime()));
       int px = (int)new_pos.x; 
       int py = (int)new_pos.y;
       if (!collides(px, py)) player_pos_ = new_pos;
     }
-    if (IsKeyDown(KEY_DOWN)) {
+    if (IsKeyDown(KEY_S)) {
       Vector2 new_pos = Vector2Subtract(player_pos_, Vector2Scale(player_dir_, 2.0 * GetFrameTime()));
+      int px = (int)new_pos.x;
+      int py = (int)new_pos.y;
+      if (!collides(px, py)) player_pos_ = new_pos;
+    }
+    Vector2 right = { -player_dir_.y, player_dir_.x };
+    if (IsKeyDown(KEY_D)) {
+      Vector2 new_pos = Vector2Add(player_pos_, Vector2Scale(right, 2.0 * GetFrameTime()));
+      int px = (int)new_pos.x; 
+      int py = (int)new_pos.y;
+      if (!collides(px, py)) player_pos_ = new_pos;
+    }
+    if (IsKeyDown(KEY_A)) {
+      Vector2 new_pos = Vector2Subtract(player_pos_, Vector2Scale(right, 2.0 * GetFrameTime()));
       int px = (int)new_pos.x;
       int py = (int)new_pos.y;
       if (!collides(px, py)) player_pos_ = new_pos;
@@ -93,6 +109,9 @@ public:
   Raycaster caster_; 
   Raycaster::Info info_;
   ResourceManager resource_manager_;
+
+  float prev_mouse_x = 0;
+  float sensitivity_ = 10.0;
 };
 
 int main(void) { 
