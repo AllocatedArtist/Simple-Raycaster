@@ -17,6 +17,8 @@ public:
     Vector2 dir_;
     Vector2 plane_;
 
+    int ceiling_index_ = 0, floor_index_ = 0;
+
     std::vector<uint32_t> map_;
     uint32_t map_width_;
     uint32_t map_height_;

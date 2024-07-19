@@ -43,6 +43,10 @@ LevelInfo LoadLevelInfo(const std::string& filepath) {
       data.at("plane_x").get_to(info.plane_x_);
     } else if (key == "plane_y") {
       data.at("plane_y").get_to(info.plane_y_);
+    } else if (key == "floor_index") {
+      data.at("floor_index").get_to(info.floor_index_);
+    } else if (key == "ceiling_index") {
+      data.at("ceiling_index").get_to(info.ceiling_index_);
     }
   }
  

@@ -29,6 +29,8 @@ void LevelEditor::LoadLevelData(const char* path) {
   player_pos_  = { info.starting_pos_x_ * grid_size_, info.starting_pos_y_ * grid_size_ };
   player_dir_ = { info.dir_x_, info.dir_y_ };
   player_plane_ = { info.plane_x_, info.plane_y_ };
+  floor_index_ = info.floor_index_;
+  ceiling_index_ = info.ceiling_index_;
 
   for (const std::string& path : info.texture_paths_) {
     AddTexture(path.c_str());
@@ -217,6 +219,36 @@ void LevelEditor::Update() {
     level_.clear();
     level_.resize((int)map_width_ * (int)map_height_);
   } 
+
+  int index_limit = textures_.size() - 1;
+  if (index_limit < 0) index_limit = 0;
+
+  if (
+    GuiSliderBar(
+      { 70.0, 30.0, 50.0, 10.0 }, 
+      "Ceiling Index:", 
+      TextFormat("%.1f", ceiling_index_), 
+      &ceiling_index_, 
+      0.0, 
+      index_limit
+      )
+    ) 
+  {
+    ceiling_index_ = roundf(ceiling_index_);
+  }
+  if (
+    GuiSliderBar(
+      { 70.0, 40.0, 50.0, 10.0 }, 
+      "Floor Index:", 
+      TextFormat("%.1f", floor_index_), 
+      &floor_index_, 
+      0.0, 
+      index_limit
+      )
+    ) 
+  {
+    floor_index_ = roundf(floor_index_);
+  }
  
   DrawText(TextFormat("Wall index: %d", wall_), 10, 50, 8, RED);  
 }
@@ -313,7 +345,9 @@ void LevelEditor::ExportLevelData() {
     { "dir_y", info.dir_y_ },
     { "plane_x", info.plane_x_ },
     { "plane_y", info.plane_y_ },
-    { "texture_paths", texture_paths_revised }
+    { "texture_paths", texture_paths_revised },
+    { "floor_index", (int)floor_index_ },
+    { "ceiling_index", (int)ceiling_index_ }
   };
 
   _js_save("level.json", data.dump(4).c_str());
@@ -331,5 +365,7 @@ LevelInfo LevelEditor::GetCurrentLevelInfo() {
   info.plane_x_ = player_plane_.x;
   info.plane_y_ = player_plane_.y;
   info.texture_paths_ = textures_;
+  info.floor_index_ = floor_index_;
+  info.ceiling_index_ = ceiling_index_;
   return info;
 }

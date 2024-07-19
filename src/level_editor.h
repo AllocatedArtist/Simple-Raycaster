@@ -55,6 +55,9 @@ private:
   std::vector<Texture> textures_data_;
   std::vector<std::string> textures_; 
 
+  float ceiling_index_ = 0;
+  float floor_index_ = 0;
+
   float plane_scale_ = 1.0;
   Vector2 player_dir_ = { 0.0, -1.0 };
   Vector2 player_plane_ = { -1.0, 0.0 };

@@ -19,14 +19,13 @@ constexpr uint32_t SCREEN_HEIGHT = 400;
 class RedScreen : public Scene {
 public:
   RedScreen(const std::string& name) : Scene(name) {
-    caster_.InitializeBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+    caster_.InitializeBuffer(200, 200);
   }
 
   void Start() override { 
     LevelEditor* editor_scene = GetSceneManager()->GetScene<LevelEditor>("editor");
 
     Raycaster::FillLevelData(info_, editor_scene->GetCurrentLevelInfo(), &resource_manager_);
-
  
     player_pos_ = info_.pos_;
     player_dir_ = info_.dir_;
@@ -83,6 +82,8 @@ public:
     caster_.UpdateBuffer();
 
     caster_.Draw();
+
+    DrawFPS(0, 0);
   }
 
   Vector2 player_pos_ = { 2, 3 };

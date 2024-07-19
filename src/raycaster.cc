@@ -30,6 +30,51 @@ void Raycaster::InitializeBuffer(uint32_t width, uint32_t height) {
 
 void Raycaster::Render(Info info) {
   float screen_width = width_;
+
+  for (int y = 0; y < height_; ++y) {
+    Vector2 raydir1 = Vector2Subtract(info.dir_, info.plane_);
+    Vector2 raydir0 = Vector2Add(info.dir_, info.plane_);
+
+    int dist_from_center = y - height_ * 0.5;
+    float camera_y = height_ * 0.5;
+
+    float row_distance = camera_y / dist_from_center;
+
+    Vector2 dir_step = Vector2Subtract(raydir1, raydir0);
+    Vector2 floor_step = Vector2Scale(Vector2Scale(dir_step, row_distance), 1 / screen_width);
+
+    Vector2 floor_pos = { 
+      info.pos_.x + row_distance * raydir0.x, 
+      info.pos_.y + row_distance * raydir0.y 
+    };
+
+    for (int x = 0; x < width_; ++x) {
+      int cell_x = (int)floor_pos.x;
+      int cell_y = (int)floor_pos.y;
+
+      ResourceManager::ImageResource* res = info.resource_manager_->GetImageDataByIndex(info.floor_index_);
+      if (res == nullptr) break;
+
+      int tex_width = res->image_.width;
+      int tex_height = res->image_.height;
+      
+      int texture_x = (int)(tex_width * (floor_pos.x - cell_x)) & (tex_width - 1);
+      int texture_y = (int)(tex_height * (floor_pos.y - cell_y)) & (tex_height - 1);     
+
+      floor_pos = Vector2Add(floor_pos, floor_step);
+
+      Color floor_texture = res->color_data_[tex_width * texture_y + texture_x];
+      pixel_buffer_[x + width_ * y] = floor_texture;
+
+      res = info.resource_manager_->GetImageDataByIndex(info.ceiling_index_);
+      if (res == nullptr) break;
+
+      Color ceiling_texture = res->color_data_[tex_width * texture_y + texture_x];
+
+      int ceiling_y = height_ - y - 1;
+      pixel_buffer_[x + width_ * ceiling_y] = ceiling_texture;
+    }
+  }
  
   for (int x = 0; x < screen_width; ++x) {
     float camera_x = 2 * x / (float)screen_width - 1;
@@ -176,7 +221,16 @@ void Raycaster::UpdateBuffer() {
 }
 
 void Raycaster::Draw() {
-  DrawTexture(render_texture_, 0, 0, WHITE);
+  float screen_width = GetScreenWidth();
+  float screen_height = GetScreenHeight();
+  DrawTexturePro(
+    render_texture_, 
+    { 0, 0, (float)width_, (float)height_ }, 
+    { 0, 0, screen_width, screen_height }, 
+    { 0, 0 }, 
+    0.0, 
+    WHITE
+  );
 }
 
 void Raycaster::FillLevelData(
@@ -195,6 +249,8 @@ void Raycaster::FillLevelData(
   raycaster_info.pos_ = { level_info.starting_pos_x_, level_info.starting_pos_y_ };
   raycaster_info.dir_ = { level_info.dir_x_, level_info.dir_y_ };
   raycaster_info.plane_ = { level_info.plane_x_, level_info.plane_y_ };
+  raycaster_info.floor_index_ = level_info.floor_index_;
+  raycaster_info.ceiling_index_ = level_info.ceiling_index_;
   for (const std::string& path : level_info.texture_paths_) {
     raycaster_info.resource_manager_->CreateImage(path);
   }
