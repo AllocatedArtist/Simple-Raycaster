@@ -1,2 +1,4 @@
 # BoomerHorrorGame
-Raycaster stuff
+Expects Emscripten compiler. 
+
+Reference [https://lodev.org/cgtutor/raycasting.html]
